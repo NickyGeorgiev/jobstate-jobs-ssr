@@ -39,6 +39,12 @@ function FacebookIcon() {
 
 export const revalidate = 60
 
+// Празен списък: страниците не се генерират при build, а при първа заявка,
+// и после се кешират за `revalidate` секунди (ISR).
+export async function generateStaticParams() {
+  return []
+}
+
 const MAIN_SITE_URL = process.env.NEXT_PUBLIC_MAIN_SITE_URL || 'https://jobstate.net'
 
 function isSafeExternalUrl(url: string | null): boolean {

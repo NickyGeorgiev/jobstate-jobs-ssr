@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { cookies } from "next/headers";
 
 import "./globals.css";
 import { Navbar } from "@/components/Navbar";
@@ -16,23 +15,29 @@ export const metadata: Metadata = {
 export default async function RootLayout({
   children,
 }: LayoutProps<"/">) {
-  const cookieStore = await cookies();
+  // Тъмната тема се зарежда винаги (без cookies()), за да може страницата да е
+  // статична/кеширана (ISR). Светлата/тъмната тема се избира в браузъра
+  // от малкия скрипт по-долу, преди първото изрисуване.
+  const darkTheme = await getDarkTheme();
 
-  const theme = cookieStore.get("theme")?.value === "light"
-    ? "light"
-    : "dark";
-
-  const darkTheme = theme === "dark"
-    ? await getDarkTheme()
-    : {};
+  const darkThemeCss = Object.entries(darkTheme)
+    .map(([key, value]) => `--${key}:${value}`)
+    .join(";");
 
   return (
     <html
       lang="bg"
-      data-theme={theme}
+      data-theme="dark"
       className="h-full antialiased"
+      suppressHydrationWarning
     >
       <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{var m=document.cookie.match(/(?:^|; )theme=(light|dark)/);document.documentElement.setAttribute('data-theme',m?m[1]:'dark')}catch(e){}",
+          }}
+        />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"
@@ -47,18 +52,11 @@ export default async function RootLayout({
       </head>
 
       <body className="min-h-full flex flex-col">
-        {theme === "dark" && (
-          <style
-            dangerouslySetInnerHTML={{
-              __html: Object.entries(darkTheme)
-                .map(
-                  ([key, value]) =>
-                    `:root{--${key}:${value}}`
-                )
-                .join(""),
-            }}
-          />
-        )}
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `:root:not([data-theme="light"]){${darkThemeCss}}`,
+          }}
+        />
 
         <Navbar />
 
