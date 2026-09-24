@@ -53,8 +53,8 @@ function isSafeExternalUrl(url: string | null): boolean {
 
 function toEmploymentType(duration: string | null): string | undefined {
   if (!duration) return undefined
-  if (duration.includes('пълен работен ден')) return 'FULL_TIME'
   if (duration.includes('непълен работен ден')) return 'PART_TIME'
+  if (duration.includes('пълен работен ден')) return 'FULL_TIME'
   if (duration.includes('Стажант')) return 'INTERN'
   if (duration.includes('Freelancer')) return 'CONTRACTOR'
   return 'OTHER'
@@ -192,9 +192,11 @@ export default async function JobDetailPage({ params }: PageProps) {
 
   const company = job.company
 
+  const externalUrl = job.external_url
+
   const applyHref =
-    job.application_mode === 'external' && isSafeExternalUrl(job.external_url)
-      ? job.external_url
+    job.application_mode === 'external' && externalUrl && isSafeExternalUrl(externalUrl)
+      ? externalUrl
       : `${MAIN_SITE_URL}/apply/${job.id}`
 
   const structuredData = {

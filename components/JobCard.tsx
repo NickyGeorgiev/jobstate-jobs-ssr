@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import { buildJobUrl, type JobListing, type CompanyInfo } from '@/lib/jobs'
-import { log } from 'next/dist/server/typescript/utils';
 
 function TierBadge({ tier }: { tier: JobListing['tier'] }) {
   if (tier === 'free') return null

@@ -33,8 +33,8 @@ export type CompanyInfo = {
   sector: string | null
   bio: string | null
   why_work_here: string | null
-  perks: string | null
-  values: string | null
+  perks: string[] | null
+  values: string[] | null
   founded_year: number | null
   employee_count: string | null
   locations_count: number | null
