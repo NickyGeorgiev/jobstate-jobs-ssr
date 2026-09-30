@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-import { getDarkTheme } from "@/lib/theme";
+import { getThemeSettings } from "@/lib/theme";
 
 export const metadata: Metadata = {
   title: "Обяви за работа — Jobstate",
@@ -15,14 +15,19 @@ export const metadata: Metadata = {
 export default async function RootLayout({
   children,
 }: LayoutProps<"/">) {
-  // Тъмната тема се зарежда винаги (без cookies()), за да може страницата да е
-  // статична/кеширана (ISR). Светлата/тъмната тема се избира в браузъра
-  // от малкия скрипт по-долу, преди първото изрисуване.
-  const darkTheme = await getDarkTheme();
+  // И двете теми се зареждат винаги (без cookies()), за да може страницата да е
+  // статична/кеширана (ISR). Коя от двете се вижда се избира в браузъра
+  // от малкия скрипт по-долу, преди първото изрисуване — просто превключва
+  // data-theme, CSS-ът за двете вече е на страницата.
+  const { dark: darkTheme, light: lightTheme } = await getThemeSettings();
 
-  const darkThemeCss = Object.entries(darkTheme)
-    .map(([key, value]) => `--${key}:${value}`)
-    .join(";");
+  const toCss = (values: Record<string, string>) =>
+    Object.entries(values)
+      .map(([key, value]) => `--${key}:${value}`)
+      .join(";");
+
+  const darkThemeCss = toCss(darkTheme);
+  const lightThemeCss = toCss(lightTheme);
 
   return (
     <html
@@ -54,7 +59,7 @@ export default async function RootLayout({
       <body className="min-h-full flex flex-col">
         <style
           dangerouslySetInnerHTML={{
-            __html: `:root:not([data-theme="light"]){${darkThemeCss}}`,
+            __html: `:root:not([data-theme="light"]){${darkThemeCss}} :root[data-theme="light"]{${lightThemeCss}}`,
           }}
         />
 
