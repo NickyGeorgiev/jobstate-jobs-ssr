@@ -33,6 +33,7 @@ export default async function OpengraphImage({ params }: Props) {
 
   const title = job?.title || 'Обява за работа'
   const [from, to] = pickGradient(job?.id || slug)
+  const logoUrl = job?.company?.logo_url || null
 
   return new ImageResponse(
     (
@@ -47,7 +48,7 @@ export default async function OpengraphImage({ params }: Props) {
           background: `linear-gradient(135deg, ${from} 0%, ${to} 100%)`,
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div
             style={{
               fontSize: 28,
@@ -58,6 +59,29 @@ export default async function OpengraphImage({ params }: Props) {
           >
             Jobstate
           </div>
+
+          {logoUrl && (
+            <div
+              style={{
+                width: 72,
+                height: 72,
+                borderRadius: 16,
+                background: '#ffffff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: 8,
+              }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={logoUrl}
+                width={56}
+                height={56}
+                style={{ objectFit: 'contain' }}
+              />
+            </div>
+          )}
         </div>
 
         <div
