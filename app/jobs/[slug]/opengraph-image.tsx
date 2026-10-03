@@ -3,6 +3,18 @@ import { extractIdFromSlugParam, getJobById } from '@/lib/jobs'
 import fs from 'fs'
 import path from 'path'
 
+const ibmRegular = fs.readFileSync(
+  path.join(process.cwd(), 'public/fonts/IBMPlexMono-Regular.ttf')
+)
+
+const ibmBold = fs.readFileSync(
+  path.join(process.cwd(), 'public/fonts/IBMPlexMono-Bold.ttf')
+)
+
+const ibmItalic = fs.readFileSync(
+  path.join(process.cwd(), 'public/fonts/IBMPlexMono-Italic.ttf')
+)
+
 const logoPath = path.join(process.cwd(), 'public', 'logo-dark.svg')
 const logoSvg = fs.readFileSync(logoPath, 'utf8')
 const logoDataUrl = `data:image/svg+xml;base64,${Buffer.from(logoSvg).toString('base64')}`
@@ -92,31 +104,36 @@ export default async function OpengraphImage({ params }: Props) {
             </div>
           )}
         </div>
+        <div style={{ borderTop: '2px solid white', marginTop: '-1.6rem' }} />
 
-        <div style={{ borderTop: '1px solid white', margin: '1rem 0 0' }} />
 
         {/* TITLE */}
         <div style={{ display: 'flex', width: '100%', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-          <span style={{ fontSize: title.length > 60 ? 48 : 64, fontWeight: 700, color: '#fff', lineHeight: 1.15, maxWidth: '95%', textShadow: '5px 5px rgb(15, 15, 15)' }}>
+          <span style={{
+            fontFamily: 'IBMBold',
+            fontSize: title.length > 60 ? 48 : 64,
+            color: '#fff',
+            textShadow: '5px 5px rgb(15, 15, 15)'
+          }}>
             {title}
           </span>
         </div>
 
         <div style={{ display: 'flex', width: '100%', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-          <span style={{ fontSize: 28, fontWeight: 700, color: '#fff', lineHeight: 1.15, maxWidth: '95%' }}>
+          <span style={{ fontSize: 28, fontFamily: 'IBMItalic', color: '#fff', lineHeight: 1.15, maxWidth: '100%', textShadow: '2px 2px rgb(15, 15, 15)' }}>
             {job?.description
-              ? job.description.replace(/\s+/g, ' ').slice(0, 140) + '...'
+              ? job.description.replace(/\s+/g, ' ').slice(0, 130) + '...'
               : ''}
           </span>
         </div>
 
-        <div style={{ borderTop: '1px solid white', margin: '0.85rem 0 0' }} />
+        <div style={{ borderTop: '2px solid white', margin: '0.85rem 0 0' }} />
 
         {/* INFO */}
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '16px' }}>
-          {job?.city && <div style={badgeStyle}>{job.city}</div>}
+          {job?.city && <div style={{...badgeStyle, fontFamily:'IBMRegular'}}>{job.city}</div>}
           {job?.salary_visible && job?.salary && (
-            <div style={badgeStyle}>
+            <div style={{...badgeStyle, fontFamily: 'IBMBold',}}>
               {job.salary_max
                 ? `${job.salary} - ${job.salary_max} €/нето`
                 : `${job.salary} €/нето`}
@@ -125,6 +142,28 @@ export default async function OpengraphImage({ params }: Props) {
         </div>
       </div>
     ),
-    size
+    {
+      ...size,
+      fonts: [
+        {
+          name: 'IBMRegular',
+          data: ibmRegular,
+          weight: 700,
+          style: 'normal',
+        },
+        {
+          name: 'IBMBold',
+          data: ibmBold,
+          weight: 900,
+          style: 'normal',
+        },
+                {
+          name: 'IBMItalic',
+          data: ibmItalic,
+          weight: 600,
+          style: 'normal',
+        },
+      ],
+    }
   )
 }
