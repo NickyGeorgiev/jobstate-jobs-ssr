@@ -15,9 +15,9 @@ const ibmItalic = fs.readFileSync(
   path.join(process.cwd(), 'public/fonts/IBMPlexMono-Italic.ttf')
 )
 
-const logoPath = path.join(process.cwd(), 'public', 'logo-dark.svg')
-const logoSvg = fs.readFileSync(logoPath, 'utf8')
-const logoDataUrl = `data:image/svg+xml;base64,${Buffer.from(logoSvg).toString('base64')}`
+const logoPath = path.join(process.cwd(), 'public', 'logo-dark-og.png')
+const logoBuffer = fs.readFileSync(logoPath)
+const logoDataUrl = `data:image/png;base64,${logoBuffer.toString('base64')}`
 
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
