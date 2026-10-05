@@ -22,124 +22,610 @@ const logoDataUrl = `data:image/png;base64,${logoBuffer.toString('base64')}`
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 
-const GRADIENTS = [
-  ['#17202A', '#31566B', '#4FB8AE'],
-  ['#201608', '#6B4215', '#BF953F'],
-  ['#2D1B3D', '#593B73', '#A879D0'],
-  ['#0F2B3D', '#185C73', '#2B8FA8'],
-  ['#3D1F1F', '#7A3630', '#C25B3F'],
-  ['#1F3D2E', '#326B4C', '#4A9B6E'],
+/* -------------------------------------------------------
+   COLOR THEMES
+------------------------------------------------------- */
 
-  ['#111827', '#374151', '#818CF8'],
-  ['#172554', '#1D4ED8', '#60A5FA'],
-  ['#312E81', '#6D28D9', '#C084FC'],
-  ['#3B0764', '#86198F', '#E879F9'],
-  ['#4A044E', '#9D174D', '#FB7185'],
-
-  ['#3F1D0B', '#B45309', '#F59E0B'],
-  ['#431407', '#C2410C', '#FB923C'],
-  ['#422006', '#854D0E', '#FACC15'],
-  ['#052E16', '#15803D', '#4ADE80'],
-  ['#042F2E', '#0F766E', '#2DD4BF'],
-
-  ['#082F49', '#0369A1', '#38BDF8'],
-  ['#18181B', '#52525B', '#A1A1AA'],
-  ['#1C1917', '#57534E', '#A8A29E'],
-  ['#0F172A', '#334155', '#64748B'],
-
-  ['#3F0D12', '#9F1239', '#FB7185'],
-  ['#27101F', '#9D174D', '#F472B6'],
-  ['#172554', '#3730A3', '#818CF8'],
-  ['#1E1B4B', '#6D28D9', '#A78BFA'],
-  ['#052E16', '#166534', '#A3E635'],
-
-  ['#042F2E', '#115E59', '#5EEAD4'],
-  ['#0C4A6E', '#155E75', '#67E8F9'],
-  ['#3F3F46', '#7C3AED', '#F0ABFC'],
-  ['#451A03', '#9A3412', '#FDBA74'],
-  ['#4C0519', '#BE123C', '#FDA4AF'],
+const THEMES = [
+  {
+    bg1: '#081B24',
+    bg2: '#123D4B',
+    accent: '#4FB8AE',
+    accent2: '#8BE5DC',
+  },
+  {
+    bg1: '#181108',
+    bg2: '#4A2B0D',
+    accent: '#D49A3A',
+    accent2: '#F4D28B',
+  },
+  {
+    bg1: '#160D24',
+    bg2: '#3A2055',
+    accent: '#A879D0',
+    accent2: '#D9B8F5',
+  },
+  {
+    bg1: '#081A2B',
+    bg2: '#124C67',
+    accent: '#2B9BC0',
+    accent2: '#8DE0F5',
+  },
+  {
+    bg1: '#210D0D',
+    bg2: '#59211F',
+    accent: '#D05A4A',
+    accent2: '#F2A195',
+  },
+  {
+    bg1: '#081C14',
+    bg2: '#16452F',
+    accent: '#4A9B6E',
+    accent2: '#9BE2B8',
+  },
+  {
+    bg1: '#0B1020',
+    bg2: '#252E48',
+    accent: '#818CF8',
+    accent2: '#B9BFFF',
+  },
+  {
+    bg1: '#10114A',
+    bg2: '#2938A0',
+    accent: '#60A5FA',
+    accent2: '#A9D4FF',
+  },
 ]
 
-function pickGradient(seed: string) {
+function pickTheme(seed: string) {
   let hash = 0
+
   for (let i = 0; i < seed.length; i++) {
     hash = (hash * 31 + seed.charCodeAt(i)) >>> 0
   }
-  return GRADIENTS[hash % GRADIENTS.length]
+
+  return THEMES[hash % THEMES.length]
 }
 
-type Props = { params: Promise<{ slug: string }> }
+/* -------------------------------------------------------
+   COMPONENT
+------------------------------------------------------- */
+
+type Props = {
+  params: Promise<{ slug: string }>
+}
 
 export default async function OpengraphImage({ params }: Props) {
   const { slug } = await params
-  const job = await getJobById(extractIdFromSlugParam(slug) || '')
+
+  const job = await getJobById(
+    extractIdFromSlugParam(slug) || ''
+  )
 
   const title = job?.title || 'Обява за работа'
-  const [from, middle, to] = pickGradient(job?.id || slug)
-  const badgeStyle = {
-    display: 'flex', fontSize: 34, color: '#fff',
-    background: 'rgba(255,255,255,0.18)', padding: '8px 20px', borderRadius: 999, textShadow: '3px 3px 3px rgb(15, 15, 15)',
-  }
+
+  const theme = pickTheme(job?.id || slug)
+
+  const city = job?.city || ''
+
+  const salary =
+    job?.salary_visible && job?.salary
+      ? job.salary_max
+        ? `${job.salary} - ${job.salary_max} €/нето`
+        : `${job.salary} €/нето`
+      : ''
+
+  const description = job?.description
+    ? job.description
+        .replace(/\s+/g, ' ')
+        .slice(0, 157)
+        .trim() + '...'
+    : ''
+
+  const companyName =
+    job?.company?.company_name || 'Работодател'
 
   return new ImageResponse(
     (
-      <div style={{
-        width: '100%', height: '100%', display: 'flex', flexDirection: 'column',
-        justifyContent: 'space-between', padding: '2rem',
-        background: `linear-gradient( 135deg, ${from} 0%, ${middle} 50%, ${to} 100% )`
-      }}>
-        {/* HEADER */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', }}>
-          <img
-            src={logoDataUrl}
-            width={320}
-            style={{ objectFit: 'contain' }}
-          />
-          {job?.company?.logo_url && (
-            <div style={{ display: 'flex', width: 220, height: 150, borderRadius: 16, background: 'rgba(200, 200, 200, 0.4)', alignItems: 'center', justifyContent: 'center', padding: 4 }}>
-              <img
-                src={job.company.logo_url}
-                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-              />
+      <div
+        style={{
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          position: 'relative',
+          overflow: 'hidden',
+          background: `linear-gradient(125deg, ${theme.bg1} 0%, ${theme.bg2} 100%)`,
+          fontFamily: 'IBMRegular',
+        }}
+      >
+
+        {/* =================================================
+            BACKGROUND DECORATION
+        ================================================= */}
+
+        {/* Large glow circle */}
+        <div
+          style={{
+            position: 'absolute',
+            width: 620,
+            height: 620,
+            borderRadius: 310,
+            right: -230,
+            top: -250,
+            background: theme.accent,
+            opacity: 0.13,
+            display: 'flex',
+          }}
+        />
+
+        {/* Second glow */}
+        <div
+          style={{
+            position: 'absolute',
+            width: 420,
+            height: 420,
+            borderRadius: 210,
+            left: -180,
+            bottom: -230,
+            background: theme.accent2,
+            opacity: 0.07,
+            display: 'flex',
+          }}
+        />
+
+        {/* Diagonal light panel */}
+        <div
+          style={{
+            position: 'absolute',
+            width: 850,
+            height: 260,
+            right: -260,
+            top: 170,
+            transform: 'rotate(-18deg)',
+            background: theme.accent,
+            opacity: 0.055,
+            display: 'flex',
+          }}
+        />
+
+        {/* Second diagonal panel */}
+        <div
+          style={{
+            position: 'absolute',
+            width: 700,
+            height: 90,
+            right: -180,
+            top: 280,
+            transform: 'rotate(-18deg)',
+            background: '#FFFFFF',
+            opacity: 0.035,
+            display: 'flex',
+          }}
+        />
+
+        {/* Decorative vertical line */}
+        <div
+          style={{
+            position: 'absolute',
+            width: 3,
+            height: 430,
+            right: 48,
+            top: 100,
+            background: theme.accent,
+            opacity: 0.35,
+            display: 'flex',
+          }}
+        />
+
+        {/* =================================================
+            DOT GRID
+        ================================================= */}
+
+        <div
+          style={{
+            position: 'absolute',
+            right: 45,
+            bottom: 48,
+            width: 190,
+            height: 155,
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 13,
+            opacity: 0.22,
+          }}
+        >
+          {Array.from({ length: 72 }).map((_, i) => (
+            <div
+              key={i}
+              style={{
+                width: 4,
+                height: 4,
+                borderRadius: 2,
+                background: theme.accent2,
+                display: 'flex',
+              }}
+            />
+          ))}
+        </div>
+
+           {/* =================================================
+            BACKGROUND — LARGE GEOMETRIC RING RIGHT CORNER
+        ================================================= */}
+
+        <div
+          style={{
+            position: 'absolute',
+            width: 490,
+            height: 490,
+            borderRadius: 295,
+            right: -80,
+            bottom: -145,
+            border: `2px solid ${theme.accent2}`,
+            opacity: 0.14,
+            display: 'flex',
+          }}
+        />
+
+        <div
+          style={{
+            position: 'absolute',
+            width: 400,
+            height: 400,
+            borderRadius: 250,
+            right: -35,
+            bottom: -100,
+            border: `1px solid ${theme.accent2}`,
+            opacity: 0.11,
+            display: 'flex',
+          }}
+        />
+
+
+           {/* =================================================
+            BACKGROUND — LARGE GEOMETRIC RING LEFT CORNER
+        ================================================= */}
+
+        <div
+          style={{
+            position: 'absolute',
+            width: 440,
+            height: 440,
+            borderRadius: 245,
+            left: -80,
+            top: -265,
+            border: `2px solid ${theme.accent2}`,
+            opacity: 0.11,
+            display: 'flex',
+          }}
+        />
+
+        <div
+          style={{
+            position: 'absolute',
+            width: 350,
+            height: 350,
+            borderRadius: 200,
+            left: -35,
+            top: -220,
+            border: `1px solid ${theme.accent2}`,
+            opacity: 0.08,
+            display: 'flex',
+          }}
+        />
+
+        {/* =================================================
+            MAIN CONTENT
+        ================================================= */}
+
+        <div
+          style={{
+            position: 'relative',
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            padding: '42px 52px',
+          }}
+        >
+
+          
+
+          {/* =================================================
+              HEADER
+          ================================================= */}
+
+          <div
+            style={{
+              display: 'flex',
+              width: '100%',
+              justifyContent: 'space-between',
+              alignItems: 'flex-start',
+            }}
+          >
+
+            {/* Jobstate logo */}
+            <img
+              src={logoDataUrl}
+              width={270}
+              style={{
+                objectFit: 'contain',
+              }}
+            />
+
+            {/* Company logo */}
+            {job?.company?.logo_url && (
+              <div
+                style={{
+                  display: 'flex',
+                  width: 200,
+                  height: 135,
+                  borderRadius: 18,
+                  background: 'rgba(255,255,255,0.88)',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: 10,
+                  boxShadow: '0 8px 30px rgba(0,0,0,0.18)',
+                }}
+              >
+                <img
+                  src={job.company.logo_url}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'contain',
+                  }}
+                />
+              </div>
+            )}
+
+          </div>
+
+          {/* =================================================
+              SMALL LABEL
+          ================================================= */}
+
+          <div
+            style={{
+              display: 'flex',
+              marginTop: 18,
+              alignItems: 'center',
+            }}
+          >
+
+            <div
+              style={{
+                display: 'flex',
+                width: 9,
+                height: 9,
+                borderRadius: 5,
+                background: theme.accent2,
+                marginRight: 10,
+                boxShadow: `0 0 12px ${theme.accent2}`
+              }}
+            />
+
+            <span
+              style={{
+                fontFamily: 'IBMBold',
+                fontSize: 24,
+                letterSpacing: 2,
+                color: theme.accent2,
+              }}
+            >
+              НОВА РАБОТА
+            </span>
+
+          </div>
+
+          {/* =================================================
+              TITLE
+          ================================================= */}
+
+          <div
+            style={{
+              display: 'flex',
+              width: '90%',
+              flexDirection: 'column',
+              marginTop: 20,
+            }}
+          >
+
+            <span
+              style={{
+                fontFamily: 'IBMBold',
+                fontSize:
+                  title.length > 65
+                    ? 31
+                    : title.length > 45
+                      ? 37
+                      : 45,
+                lineHeight: 1.08,
+                color: '#FFFFFF',
+                textShadow: '4px 4px 0 rgba(0,0,0,0.22)',
+              }}
+            >
+              {title}
+            </span>
+
+          </div>
+
+          {/* =================================================
+              COMPANY
+          ================================================= */}
+
+          <div
+            style={{
+              display: 'flex',
+              marginTop: 17,
+              width: '68%',
+            }}
+          >
+
+            <div
+              style={{
+                display: 'flex',
+                width: 4,
+                height: 34,
+                borderRadius: 2,
+                background: theme.accent,
+                marginRight: 12,
+              }}
+            />  
+
+            <span
+              style={{
+                fontFamily: 'IBMRegular',
+                fontSize: 27,
+                color: '#FFFFFF',
+                opacity: 0.88,
+              }}
+            >
+              {companyName}
+            </span>
+
+          </div>
+
+          {/* =================================================
+              DESCRIPTION
+          ================================================= */}
+
+          {description && (
+            <div
+              style={{
+                display: 'flex',
+                width: '70%',
+                marginTop: 22,
+              }}
+            >
+
+              <span
+                style={{
+                  fontFamily: 'IBMItalic',
+                  fontSize: 23,
+                  lineHeight: 1.25,
+                  color: '#FFFFFF',
+                  opacity: 0.72,
+                }}
+              >
+                {description}
+              </span>
+
             </div>
           )}
+
+          {/* =================================================
+              BOTTOM INFO
+          ================================================= */}
+
+          <div
+            style={{
+              paddingTop: '1rem',
+              display: 'flex',
+              marginTop: 'auto',
+              alignItems: 'center',
+              width: '100%',
+            }}
+          >
+
+            {/* City */}
+            {city && (
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '10px 18px',
+                  borderRadius: 999,
+                  background: 'rgba(255,255,255,0.12)',
+                  border: '1px solid rgba(255,255,255,0.18)',
+                  marginRight: 12,
+                }}
+              >
+
+                <span
+                  style={{
+                    fontFamily: 'IBMRegular',
+                    fontSize: 25,
+                    color: '#FFFFFF',
+                  }}
+                >
+                  📍 {city}
+                </span>
+
+              </div>
+            )}
+
+            {/* Salary */}
+            {salary && (
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '10px 20px',
+                  borderRadius: 999,
+                  background: theme.accent,
+                  boxShadow: `0 5px 18px ${theme.accent}55`,
+                }}
+              >
+
+                <span
+                  style={{
+                    fontFamily: 'IBMBold',
+                    fontSize: 25,
+                    color: '#FFFFFF',
+                  }}
+                >
+                  {salary}
+                </span>
+
+              </div>
+            )}
+
+          </div>
+
+          {/* =================================================
+              FOOTER
+          ================================================= */}
+
+          <div
+            style={{
+              display: 'flex',
+              width: '100%',
+              marginTop: 17,
+              paddingTop: 13,
+              borderTop: '1px solid rgba(255,255,255,0.18)',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
+
+            <span
+              style={{
+                fontFamily: 'IBMBold',
+                fontSize: 19,
+                letterSpacing: 1.5,
+                color: '#FFFFFF',
+                opacity: 0.65,
+              }}
+            >
+              JOBSTATE®
+            </span>
+
+            <span
+              style={{
+                fontFamily: 'IBMRegular',
+                fontSize: 18,
+                color: '#FFFFFF',
+                opacity: 0.55,
+              }}
+            >
+              Открий нови възможности
+            </span>
+
+          </div>
+
         </div>
-        <div style={{ borderTop: '2px solid white', marginTop: '-1.6rem' }} />
 
-
-        {/* TITLE */}
-        <div style={{ display: 'flex', width: '100%', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-          <span style={{
-            fontFamily: 'IBMBold',
-            fontSize: title.length > 60 ? 48 : 64,
-            color: '#fff',
-            textShadow: '5px 5px rgb(15, 15, 15)'
-          }}>
-            {title}
-          </span>
-        </div>
-
-        <div style={{ display: 'flex', width: '100%', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-          <span style={{ fontSize: 28, fontFamily: 'IBMItalic', color: '#fff', lineHeight: 1.15, maxWidth: '100%', textShadow: '2px 2px rgb(15, 15, 15)' }}>
-            {job?.description
-              ? job.description.replace(/\s+/g, ' ').slice(0, 130) + '...'
-              : ''}
-          </span>
-        </div>
-
-        <div style={{ borderTop: '2px solid white', margin: '0.85rem 0 0' }} />
-
-        {/* INFO */}
-        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '16px' }}>
-          {job?.city && <div style={{...badgeStyle, fontFamily:'IBMRegular'}}>{job.city}</div>}
-          {job?.salary_visible && job?.salary && (
-            <div style={{...badgeStyle, fontFamily: 'IBMBold',}}>
-              {job.salary_max
-                ? `${job.salary} - ${job.salary_max} €/нето`
-                : `${job.salary} €/нето`}
-            </div>
-          )}
-        </div>
       </div>
     ),
     {
@@ -148,20 +634,20 @@ export default async function OpengraphImage({ params }: Props) {
         {
           name: 'IBMRegular',
           data: ibmRegular,
-          weight: 700,
+          weight: 400,
           style: 'normal',
         },
         {
           name: 'IBMBold',
           data: ibmBold,
-          weight: 900,
+          weight: 700,
           style: 'normal',
         },
-                {
+        {
           name: 'IBMItalic',
           data: ibmItalic,
-          weight: 600,
-          style: 'normal',
+          weight: 400,
+          style: 'italic',
         },
       ],
     }
