@@ -106,12 +106,22 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const description = job.description.slice(0, 160)
   const canonicalPath = `/jobs/${job.slug || 'obiava'}-${job.id}`
+  const canonicalUrl = `https://jobs.jobstate.net${canonicalPath}`
+
+  const ogImage = job.og_image_url
+    ? {
+        url: job.og_image_url,
+        width: 1200,
+        height: 630,
+        alt: `${job.title}${job.company?.company_name ? ` — ${job.company.company_name}` : ''}`,
+      }
+    : undefined
 
   return {
     title,
     description,
     alternates: {
-      canonical: canonicalPath,
+      canonical: canonicalUrl,
     },
     robots: {
       index: true,
@@ -121,12 +131,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title,
       description,
       type: 'website',
-      url: canonicalPath,
+      url: canonicalUrl,
+      siteName: 'Jobstate',
+      images: ogImage ? [ogImage] : undefined,
     },
     twitter: {
-      card: 'summary',
+      card: 'summary_large_image',
       title,
       description,
+      images: ogImage ? [ogImage.url] : undefined,
     },
   }
 }

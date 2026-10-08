@@ -21,6 +21,7 @@ export type JobListing = {
   created_at: string
   view_count: number
   banner_url: string | null
+  og_image_url: string | null
   tier: 'free' | 'silver' | 'gold' | 'platinum' | 'diamond'
   tier_rank: number
 }
@@ -142,7 +143,7 @@ export async function getCompanyJobs(companyId: string, currentJobId?: string): 
   const query = supabase
     .from('job_listings')
     .select(
-      'id, company_id, title, description, slug, sector, level, duration, city, salary, salary_max, salary_visible, application_mode, external_url, status, published_at, expires_at, created_at, view_count, banner_url, tier, tier_rank'
+      'id, company_id, title, description, slug, sector, level, duration, city, salary, salary_max, salary_visible, application_mode, external_url, status, published_at, expires_at, created_at, view_count, banner_url, og_image_url, tier, tier_rank'
     )
     .eq('company_id', companyId)
     .eq('status', 'published')
