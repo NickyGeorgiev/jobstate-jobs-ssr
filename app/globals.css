@@ -868,6 +868,7 @@ html.dark-mode .btn-apply {
   .job-card-header-row {gap: 0.5rem;}
   .job-card-description { display: none; }
   .job-card-divider {margin: 0.5rem 0 0.5rem;}
+  .job-card-tags > .job-tag:nth-child(2), .job-tag:nth-child(3) { display: none; }
   .job-list-shell {padding: 1.5rem 1rem;}
 }
 
