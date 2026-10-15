@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { buildJobUrl, type JobListing, type CompanyInfo } from '@/lib/jobs'
+import { descriptionToPlainText } from '@/lib/richText'
 
 function TierBadge({ tier }: { tier: JobListing['tier'] }) {
   if (tier === 'free') return null
@@ -88,7 +89,7 @@ export function JobCard({ job, variant = 'list' }: JobCardProps) {
 
         <hr className="job-card-divider" />
 
-        {job.description && <p className="job-card-description">{job.description}</p>}
+        {job.description && <p className="job-card-description">{descriptionToPlainText(job.description)}</p>}
 
         <div className="job-card-bottom-row">
           <div className="job-card-tags">

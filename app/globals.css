@@ -285,6 +285,32 @@ a { color: inherit; text-decoration: none; }
 .tier-badge--platinum { background: rgba(229, 228, 226, 0.4); color: #e5e4e2; border: 1px solid #e5e4e2; box-shadow: 0 0 12px 2px rgba(229, 228, 226, 0.6); }
 .tier-badge--diamond { background: rgba(185, 242, 255, 0.4); color: #b9f2ff; border: 1px solid #b9f2ff; box-shadow: 0 0 15px 2px rgba(185, 242, 255, 0.8), inset 0 0 6px rgba(240, 185, 255, 0.3); }
 
+/* Светла тема: по-тъмни текст и рамка, по-слабо сияние (светлите цветове се губят на бял фон) */
+html[data-theme="light"] .tier-badge--silver {
+  background: rgba(110, 113, 120, 0.15);
+  color: #2f3237;
+  border: 1px solid #6b6e75;
+  box-shadow: 0 0 6px 1px rgba(110, 113, 120, 0.3);
+}
+html[data-theme="light"] .tier-badge--gold {
+  background: rgba(191, 149, 63, 0.2);
+  color: #4a3305;
+  border: 1px solid #9a7420;
+  box-shadow: 0 0 6px 1px rgba(154, 116, 32, 0.35);
+}
+html[data-theme="light"] .tier-badge--platinum {
+  background: rgba(95, 105, 125, 0.15);
+  color: #2b3340;
+  border: 1px solid #556070;
+  box-shadow: 0 0 6px 1px rgba(85, 96, 112, 0.35);
+}
+html[data-theme="light"] .tier-badge--diamond {
+  background: rgba(27, 160, 192, 0.15);
+  color: #04485c;
+  border: 1px solid #1596b6;
+  box-shadow: 0 0 6px 1px rgba(21, 150, 182, 0.4), inset 0 0 5px rgba(160, 90, 200, 0.2);
+}
+
 .job-card {
   position: relative;
   overflow: hidden;
@@ -576,6 +602,63 @@ html.dark-mode .btn-apply {
 .job-detail-description {
   color: var(--color-text);
   line-height: 1.75;
+}
+
+.job-detail-description p {
+  margin: 0 0 0.9rem;
+}
+
+.job-detail-description h2,
+.job-detail-description h3 {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 1.4rem 0 0.5rem;
+}
+
+.job-detail-description ul {
+  list-style: disc;
+  padding-left: 1.5rem;
+  margin: 0 0 0.9rem;
+}
+
+.job-detail-description ol {
+  list-style: decimal;
+  padding-left: 1.5rem;
+  margin: 0 0 0.9rem;
+}
+
+.job-detail-description li {
+  margin-bottom: 0.3rem;
+}
+
+.job-detail-description strong,
+.job-detail-description b {
+  font-weight: 700;
+}
+
+.job-detail-description ul.check-list {
+  list-style: none;
+  padding-left: 0;
+}
+
+.job-detail-description ul.check-list li {
+  position: relative;
+  padding-left: 1.6rem;
+}
+
+.job-detail-description ul.check-list li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--color-teal);
+  font-weight: 700;
+}
+
+.job-detail-description hr {
+  border: 0;
+  border-top: 1px solid var(--color-border);
+  margin: 1.5rem 0;
 }
 
 

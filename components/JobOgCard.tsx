@@ -1,5 +1,6 @@
 import fs from 'fs'
 import path from 'path'
+import { descriptionToPlainText } from '@/lib/richText'
 
 const backgroundFiles = ['theme-01.png','theme-02.png','theme-03.png','theme-04.png','theme-05.png','theme-06.png','theme-07.png','theme-08.png', ]
 
@@ -151,8 +152,7 @@ export function JobOgCard({
       : ''
 
   const description = job.description
-    ? job.description
-        .replace(/\s+/g, ' ')
+    ? descriptionToPlainText(job.description)
         .slice(0, 157)
         .trim() + '...'
     : ''

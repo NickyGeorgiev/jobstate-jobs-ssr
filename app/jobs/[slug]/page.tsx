@@ -11,6 +11,7 @@ import {
 import { ViewCounter } from '@/components/ViewCounter'
 import { JobCard } from '@/components/JobCard'
 import { CopyLinkButton } from '@/components/CopyLinkButton'
+import { looksLikeHtml, sanitizeJobDescription, descriptionToPlainText } from '@/lib/richText'
 
 
 function ViberIcon() {
@@ -104,7 +105,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     : ''
     } | Jobstate`
 
-  const description = job.description.slice(0, 160)
+  const description = descriptionToPlainText(job.description).slice(0, 160)
   const canonicalPath = `/jobs/${job.slug || 'obiava'}-${job.id}`
   const canonicalUrl = `https://jobs.jobstate.net${canonicalPath}`
 
@@ -222,7 +223,9 @@ export default async function JobDetailPage({ params }: PageProps) {
     '@context': 'https://schema.org/',
     '@type': 'JobPosting',
     title: job.title,
-    description: job.description,
+    description: looksLikeHtml(job.description)
+      ? sanitizeJobDescription(job.description)
+      : job.description,
     datePosted: job.published_at || job.created_at,
 
     hiringOrganization: {
@@ -460,9 +463,16 @@ export default async function JobDetailPage({ params }: PageProps) {
 
           <hr className="job-card-divider" />
 
-          <article className="job-detail-description mt-8 whitespace-pre-wrap leading-relaxed">
-            {job.description}
-          </article>
+          {looksLikeHtml(job.description) ? (
+            <article
+              className="job-detail-description mt-8 leading-relaxed"
+              dangerouslySetInnerHTML={{ __html: sanitizeJobDescription(job.description) }}
+            />
+          ) : (
+            <article className="job-detail-description mt-8 whitespace-pre-wrap leading-relaxed">
+              {job.description}
+            </article>
+          )}
 
           <hr className="job-card-divider" />
 
