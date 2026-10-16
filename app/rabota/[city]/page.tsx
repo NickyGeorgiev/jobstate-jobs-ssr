@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { getActiveCities, getJobsByCityName } from '@/lib/jobs'
 import { slugify, matchSlug } from '@/lib/slug'
 import { JobCard } from '@/components/JobCard'
+import { jsonLdString } from '@/lib/jsonLd'
 
 export const revalidate = 60
 
@@ -80,7 +81,7 @@ export default async function CityJobsPage({ params }: PageProps) {
     <main className="job-list-shell">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdString(itemListJsonLd) }}
       />
 
       <header className="mb-10">

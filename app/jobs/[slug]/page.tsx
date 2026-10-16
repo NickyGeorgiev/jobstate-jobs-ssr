@@ -11,6 +11,7 @@ import {
 import { ViewCounter } from '@/components/ViewCounter'
 import { JobCard } from '@/components/JobCard'
 import { CopyLinkButton } from '@/components/CopyLinkButton'
+import { jsonLdString } from '@/lib/jsonLd'
 import { looksLikeHtml, sanitizeJobDescription, descriptionToPlainText } from '@/lib/richText'
 
 
@@ -312,9 +313,9 @@ export default async function JobDetailPage({ params }: PageProps) {
 
       <ViewCounter jobId={job.id} />
 
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData), }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(structuredData) }} />
 
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(breadcrumbJsonLd) }} />
 
       <a href="/" className="text-sm text-muted hover:underline job-back-link">
         ← Всички обяви
